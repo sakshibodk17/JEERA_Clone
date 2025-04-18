@@ -1,4 +1,5 @@
 const mongoose= require("mongoose");
+const userMiddleware = require("../middleware/index");
 
 //Schema 
 const userSchema= new mongoose.Schema({
@@ -17,16 +18,26 @@ const userSchema= new mongoose.Schema({
         unique: true,
     },
 
-    JobTitle:{
+    Password:{
         type:String,  
         required:true,
     },
 
-    Gender:{
-        type: String,
+  isVerified:{
+        type: Boolean,
+        default: false,
     },
-})
+    createdAt:{
+        type: Date,
+        default: Date.now,
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+      },
+});
 
+userMiddleware(userSchema);
 //Model creation 
  const User= mongoose.model("user", userSchema);
 

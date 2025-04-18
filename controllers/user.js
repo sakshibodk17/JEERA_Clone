@@ -1,53 +1,32 @@
 const User = require("../models/user");
 
-async function handleGetallUsers(req, res){
-    const alldbUsers= await User.find({});
-    return res.json(alldbUsers);
-}
+async function registerUser (req, res) {
+  try {
+    const { FirstName, LastName, Email, Password } = req.body;
 
-async function handleGetUserbyId(req, res) {
-        const user= await User.findById(req.params.id);
-        if(!user) return res.status(404).json({error:"user not found"});
-        return res.json(user);
-    
-}
-
-async function handleUpdateUserbyID(req, res){
-    await User.findByIdAndUpdate(req.params.id, {LastName:"Changed"});
-    return res.json({status:"Success"});
-}
-
-async function handleDeleteUserbyId(req, res){
-    await User.findByIdAndDelete(req. params.id);
-    return res.json({status:"Success"});
-}
-
-async function handleCreateNewUser(req, res){
-    const body=req.body;
-    if(
-        !body ||
-        !body.first_name ||
-        !body.last_name ||
-        !body.email ||
-        !body.job_title ||
-        !body.gender 
-    ) {
-        return res.status(400).json({msg:"All fields are required"});
+    const existingUser= await User.findOne({Email});
+    if(existingUser){
+      return res.status(400).json({message: "User already exists with this email "});
     }
-    const result=await User.create({
-        FirstName:body.first_name,
-        LastName:body.last_name ,
-        Email:body.email,
-        JobTitle:body.job_title,
-        Gender:body.gender,
-    });
-    return res.status(201).json({msg:"Success", id: result._id});
-} 
+
+    const newUser = new User({ FirstName, LastName, Email, Password });
+    await newUser.save();
+    res.status(201).json({ message: "User registered successfully!",user: newUser }); 
+  } catch (error) {
+    res.status(400).json({ message:"Error registering user", error: error.message });
+  }
+}
+
+async function getAllUsers(req, res) {
+  try {
+    const users = await User.find().select("-Password");
+    res.status(200).json({ users });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching users", error: err.message });
+  }
+}
 
 module.exports={
-    handleGetallUsers,
-    handleGetUserbyId,
-    handleUpdateUserbyID,
-    handleDeleteUserbyId,
-    handleCreateNewUser,
-}
+  registerUser,
+  getAllUsers,
+};

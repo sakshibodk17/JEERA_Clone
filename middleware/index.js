@@ -1,19 +1,11 @@
-const fs= require("fs");
-
-function logReqRes(filename){
-    return(req, res, next)=>{
-        fs.appendFile(
-            filename,`\n${Date.now()}:${res.ip} ${req.method} : ${req.path}\n`,
-            (error, data)=>{
-                next();
-            }
-        );
-
-
-    };
-
-}
-
-module.exports={
-    logReqRes,
-};
+module.exports = function userMiddleware(schema) {
+    if (!schema || typeof schema.pre !== "function") {
+      throw new Error("Invalid schema passed to middleware");
+    }
+  
+    schema.pre("save", function (next) {
+      this.updatedAt = Date.now();
+      next();
+    });
+  };
+  
