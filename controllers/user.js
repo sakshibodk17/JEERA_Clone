@@ -33,21 +33,16 @@ async function loginHandler(req, res){
 
   const {Email, Password}= req.body;
   try {
-    console.log("In handler",Email
-      ,Password
-    );
-    
-  const data = await login({Email, Password},res);
-  return res.status(200).json({message:"login successfull"});
+  const data = await login({Email, Password});
+  return res.status(200).json({message:"login Successful",  
+    token: data.token,
+    user:{ID: data.ID, Name: data.Name}
+  });
     
   } catch (error) {
-    console.error( error);
-    return res.status(500).json({ message: error.message });
-    
+    return res.status(500).json({ message: error.message });  
     
   }
-
-
 }
 
 async function forgetPassword(req, res){
@@ -82,6 +77,23 @@ async function resetPassword(req, res){
   }
 }
 
+async function deleteUser(req, res){
+  const{Email} = req.body;
+
+  try{
+    const user= await User.findOneAndDelete({Email});
+    if(!user){
+      return res.status(404).json({message:"User not found"});
+    }
+
+    res.status(200).json({message:"User deleted successfully"});
+  } catch(error){
+    res.status(500).json({message:"Error deleting user", error:console.error.message});
+    
+  }
+  }
+
+
 
 module.exports={
   registerUser,
@@ -89,4 +101,5 @@ module.exports={
   loginHandler,
   forgetPassword,
   resetPassword,
+  deleteUser,
 };  
