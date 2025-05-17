@@ -2,8 +2,9 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    await mongoose.connect("mongodb://localhost:27017/Clone_db");
-    console.log("MongoDB connected");
+    url = "mongodb://localhost:27017/Clone_db"
+    await mongoose.connect(url);
+    console.log(`MongoDB connected to ${url}`);
   } catch (err) {
     console.error("MongoDB connection failed:", err.message);
   }
